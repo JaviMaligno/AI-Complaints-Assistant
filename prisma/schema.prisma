@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  phone         String?
+  createdAt     DateTime       @default(now())
+  orders        Order[]
+  complaints    Complaint[]
+  conversations Conversation[]
+}
+
+model Order {
+  id                   String         @id @default(cuid())
+  orderNumber          String         @unique
+  customerId           String
+  customer             Customer       @relation(fields: [customerId], references: [id])
+  vehicleReg           String
+  vehicleMake          String
+  vehicleModel         String
+  vehicleYear          Int
+  purchaseDate         DateTime
+  purchasePrice        Float
+  depositPaid          Float
+  financeAmount        Float?
+  deliveryDate         DateTime?
+  deliveryAddress      String
+  deliveryStatus       String         @default("PENDING")
+  warrantyExpiry       DateTime
+  warrantyType         String         @default("STANDARD_90")
+  accessories          String         @default("[]")
+  accessoriesDelivered Boolean        @default(false)
+  complaints           Complaint[]
+  createdAt            DateTime       @default(now())
+}
+
+model Complaint {
+  id              String            @id @default(cuid())
+  referenceNumber String            @unique
+  customerId      String
+  customer        Customer          @relation(fields: [customerId], references: [id])
+  orderId         String?
+  order           Order?            @relation(fields: [orderId], references: [id])
+  category        String
+  subcategory     String?
+  status          String            @default("OPEN")
+  priority        String            @default("NORMAL")
+  aiHandled       Boolean           @default(false)
+  aiResolution    String?
+  aiConfidence    Float?
+  escalatedReason String?
+  resolvedAt      DateTime?
+  resolutionType  String?
+  resolutionValue Float?
+  resolutionNotes String?
+  csatScore       Int?
+  csatFeedback    String?
+  conversations   Conversation[]
+  actions         ComplaintAction[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Conversation {
+  id          String    @id @default(cuid())
+  customerId  String?
+  customer    Customer?  @relation(fields: [customerId], references: [id])
+  complaintId String?
+  complaint   Complaint? @relation(fields: [complaintId], references: [id])
+  channel     String    @default("WEBCHAT")
+  status      String    @default("ACTIVE")
+  messages    Message[]
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  role           String
+  content        String
+  intent         String?
+  confidence     Float?
+  sentiment      Float?
+  createdAt      DateTime     @default(now())
+}
+
+model ComplaintAction {
+  id           String    @id @default(cuid())
+  complaintId  String
+  complaint    Complaint @relation(fields: [complaintId], references: [id])
+  actionType   String
+  status       String    @default("PENDING")
+  amount       Float?
+  description  String
+  authorizedBy String
+  approvedBy   String?
+  executedAt   DateTime?
+  createdAt    DateTime  @default(now())
+}
