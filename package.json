@@ -10,7 +10,9 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test:ai": "npx promptfoo eval",
+    "test:ai:view": "npx promptfoo view"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",

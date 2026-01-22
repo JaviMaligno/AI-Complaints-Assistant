@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Bot,
   TrendingUp,
+  PlayCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -119,6 +120,14 @@ export default function AdminDashboard() {
             </Link>
             <div className="h-6 w-px bg-white/20" />
             <h1 className="text-xl font-bold">Admin Dashboard</h1>
+            <div className="h-6 w-px bg-white/20" />
+            <Link
+              href="/admin/simulations"
+              className="flex items-center gap-2 text-white/80 hover:text-white text-sm"
+            >
+              <PlayCircle className="w-4 h-4" />
+              AI Simulations
+            </Link>
           </div>
           <button
             onClick={fetchData}

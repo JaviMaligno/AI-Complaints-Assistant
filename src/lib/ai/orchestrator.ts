@@ -1,4 +1,4 @@
-import { getMainModel, getFastModel, generateContent, parseJsonResponse } from "./gemini";
+import { generateContentMain, generateContentFast, parseJsonResponse } from "./gemini";
 import { INTENT_PROMPT, buildConversationPrompt, WELCOME_MESSAGE } from "./prompts";
 import { runGuardrails, isRefundAuthorized } from "./guardrails";
 import { prisma } from "@/lib/db/prisma";
@@ -27,11 +27,10 @@ interface IntentClassification {
  * Classify the intent of a customer message
  */
 async function classifyIntent(message: string): Promise<IntentClassification> {
-  const model = getFastModel();
   const prompt = INTENT_PROMPT + message;
 
   try {
-    const response = await generateContent(model, prompt);
+    const response = await generateContentFast(prompt);
     return parseJsonResponse<IntentClassification>(response);
   } catch (error) {
     console.error("Intent classification failed:", error);
@@ -155,7 +154,7 @@ async function getOrCreateConversation(
   // Create new conversation
   const conversation = await prisma.conversation.create({
     data: {
-      customerId: customerId || "anonymous",
+      customerId: customerId || null,
       channel: "WEBCHAT",
       status: "ACTIVE",
     },
@@ -487,7 +486,6 @@ export async function processMessage(
   }));
 
   // Build the prompt and get AI response
-  const model = getMainModel();
   const prompt = buildConversationPrompt(
     messages,
     customerContext,
@@ -496,7 +494,7 @@ export async function processMessage(
 
   let aiResponse: AIResponse;
   try {
-    const rawResponse = await generateContent(model, prompt);
+    const rawResponse = await generateContentMain(prompt);
     aiResponse = parseJsonResponse<AIResponse>(rawResponse);
   } catch (error) {
     console.error("AI response generation failed:", error);
