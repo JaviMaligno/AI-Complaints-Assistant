@@ -408,7 +408,7 @@ export default function ChatWidget({ className, defaultOpen = false }: ChatWidge
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyPress}
                     placeholder="Type your message..."
-                    className="flex-1 px-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:border-carsa-primary focus:ring-2 focus:ring-carsa-primary/20 text-sm"
+                    className="flex-1 px-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:border-carsa-primary focus:ring-2 focus:ring-carsa-primary/20 text-sm text-gray-900 placeholder:text-gray-400"
                     disabled={isLoading}
                   />
                   <button
