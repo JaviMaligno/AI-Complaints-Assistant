@@ -1,0 +1,29 @@
+name: Source compatibility
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+permissions:
+  contents: read
+concurrency:
+  group: source-compatibility-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      CHECKPOINT_DISABLE: '1'
+      # Syntax-valid placeholder only; no database is provisioned or migrated.
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/unused
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run db:generate
+      - run: npx --no-install tsc --noEmit --incremental false
+      - name: Build when ready
+        if: github.event.pull_request.draft == false
+        run: npm run build
