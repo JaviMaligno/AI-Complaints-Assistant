@@ -27,3 +27,6 @@ jobs:
       - name: Build when ready
         if: github.event.pull_request.draft == false
         run: npm run build
+      - name: Offline Prisma configuration dependency contracts
+        if: github.event.pull_request.draft == false
+        run: node security/prisma-config.contract.cjs
